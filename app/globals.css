@@ -1,5 +1,7 @@
 /* app/globals.css */
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Root variables (keep if you plan to use them) */
 :root {
