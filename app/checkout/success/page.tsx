@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
+// 🚀 This disables static prerendering
+export const dynamic = 'force-dynamic'
+
 export default function SuccessPage() {
   const qs = useSearchParams()
   const sessionId = qs.get('session_id')
