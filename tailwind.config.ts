@@ -1,11 +1,16 @@
 // tailwind.config.ts
 import type { Config } from "tailwindcss";
 
-export default {
+const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",   // include pages for API routes or legacy pages
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  theme: { extend: {} },
+  theme: {
+    extend: {},
+  },
   plugins: [],
-} satisfies Config;
+};
+
+export default config;
