@@ -1,77 +1,44 @@
-'use client'
-
-import Link from 'next/link'
-import Image from 'next/image'
-import { useState } from 'react'
-import { useSession, signIn, signOut } from 'next-auth/react'
+// components/Navbar.tsx
+"use client"
+import { useState } from "react"
+import Link from "next/link"
+import { ShoppingCart } from "lucide-react"
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
-  const { data: session } = useSession()
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b0f]/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 text-sm">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.svg" alt="Inkwell Studios" width={32} height={32} />
+    <header className="fixed top-0 w-full bg-inkBlack border-b border-gray-800 z-50">
+      <div className="container mx-auto flex items-center justify-between px-6 py-4">
+        
+        {/* Logo */}
+        <Link href="/" className="flex items-center space-x-2">
+          <img src="/logo.png" alt="Logo" className="h-8 w-8" />
+          <span className="font-bold">Inkwell Studios</span>
         </Link>
-        <nav className="hidden items-center gap-6 md:flex">
-          <Link href="/products" className="hover:text-white">Store</Link>
-          <Link href="/commissions" className="hover:text-white">Commissions</Link>
+
+        {/* Links */}
+        <nav className="hidden md:flex space-x-8">
+          <Link href="/store">Store</Link>
+          <Link href="/commissions">Commissions</Link>
+          <Link href="/videos">Videos</Link>
           <div className="relative group">
-            <button className="flex items-center gap-1 hover:text-white">Support ▾</button>
-            <div className="absolute left-1/2 top-full hidden w-40 -translate-x-1/2 rounded-md border border-white/10 bg-[#1d1d1f] text-sm group-hover:block">
-              <Link href="/faq" className="block px-4 py-2 hover:bg-white/5">FAQ</Link>
-              <Link href="/forums" className="block px-4 py-2 hover:bg-white/5">Forums</Link>
-              <Link href="/ticket" className="block px-4 py-2 hover:bg-white/5">Support Ticket</Link>
-            </div>
-          </div>
-          <div className="relative group">
-            <button className="flex items-center gap-1 hover:text-white">About ▾</button>
-            <div className="absolute left-1/2 top-full hidden w-40 -translate-x-1/2 rounded-md border border-white/10 bg-[#1d1d1f] text-sm group-hover:block">
-              <Link href="/about" className="block px-4 py-2 hover:bg-white/5">About Us</Link>
-              <a href="https://discord.gg/" className="block px-4 py-2 hover:bg-white/5" target="_blank" rel="noopener noreferrer">Discord</a>
+            <button className="hover:text-inkPink">About</button>
+            <div className="absolute hidden group-hover:block bg-inkGray text-sm rounded-lg mt-2 shadow-lg">
+              <Link href="/about" className="block px-4 py-2 hover:bg-gray-700">About Us</Link>
+              <Link href="https://discord.gg/yourlink" target="_blank" className="block px-4 py-2 hover:bg-gray-700">Discord</Link>
             </div>
           </div>
         </nav>
-        <div className="flex items-center gap-4">
-          <Link href="/cart" aria-label="Cart" className="hover:text-white">🛒</Link>
-          {session ? (
-            <button onClick={() => signOut()} className="flex items-center gap-2 hover:text-white">
-              {session.user?.image && (
-                <Image src={session.user.image} alt={session.user.name || ''} width={24} height={24} className="rounded-full" />
-              )}
-              <span>{session.user?.name}</span>
-            </button>
-          ) : (
-            <button onClick={() => signIn('discord')} className="rounded bg-pink-500 px-3 py-1 text-white hover:bg-pink-600">Sign In</button>
-          )}
-          <button className="md:hidden" onClick={() => setOpen(v => !v)} aria-label="Toggle Menu">☰</button>
+
+        {/* Right Side */}
+        <div className="flex items-center space-x-4">
+          <ShoppingCart className="w-6 h-6 cursor-pointer" />
+          <button className="px-4 py-2 rounded-full bg-white text-black font-medium hover:bg-gray-200">
+            Sign In
+          </button>
         </div>
       </div>
-      {open && (
-        <div className="border-t border-white/10 bg-[#0b0b0f] md:hidden">
-          <div className="mx-auto max-w-6xl px-6 py-3 space-y-2">
-            <Link href="/products" onClick={() => setOpen(false)} className="block">Store</Link>
-            <Link href="/commissions" onClick={() => setOpen(false)} className="block">Commissions</Link>
-            <div>
-              <span className="block">Support</span>
-              <div className="pl-4 space-y-1">
-                <Link href="/faq" onClick={() => setOpen(false)} className="block">FAQ</Link>
-                <Link href="/forums" onClick={() => setOpen(false)} className="block">Forums</Link>
-                <Link href="/ticket" onClick={() => setOpen(false)} className="block">Support Ticket</Link>
-              </div>
-            </div>
-            <div>
-              <span className="block">About</span>
-              <div className="pl-4 space-y-1">
-                <Link href="/about" onClick={() => setOpen(false)} className="block">About Us</Link>
-                <a href="https://discord.gg/" onClick={() => setOpen(false)} className="block" target="_blank" rel="noopener noreferrer">Discord</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   )
 }

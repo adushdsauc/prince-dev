@@ -1,15 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* app/globals.css */
+@import "tailwindcss";
 
+/* Root variables (keep if you plan to use them) */
 :root {
   --bg: 255 255 255;
 }
 
-html, body {
+/* Base */
+html,
+body {
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* We set body classes in layout.tsx, but add smoothing here */
 body {
-  @apply bg-[#0b0b0f] text-gray-200 antialiased;
+  background-color: #0b0b0f; /* fallback if classes are removed */
+  color: rgb(229 231 235);   /* tailwind gray-200 equivalent */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Text selection highlight */
+::selection {
+  background: rgba(236, 72, 153, 0.3); /* pink-500/30 */
+  color: #fff;
+}
+
+/* Storefront hero stripes */
+.bg-diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    -30deg,
+    rgba(255, 255, 255, 0.06) 0px,
+    rgba(255, 255, 255, 0.06) 2px,
+    transparent 2px,
+    transparent 18px
+  );
+}
+
+/* Optional starfield used in the hero */
+.bg-stars {
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5) 40%, transparent 41%),
+    radial-gradient(1.5px 1.5px at 70% 20%, rgba(255,255,255,0.45) 40%, transparent 41%),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.35) 40%, transparent 41%),
+    radial-gradient(2px 2px at 85% 70%, rgba(255,255,255,0.35) 40%, transparent 41%),
+    radial-gradient(1px 1px at 10% 60%, rgba(255,255,255,0.3) 40%, transparent 41%);
+  background-size: 100% 100%;
+  animation: twinkle 8s linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: .25; }
+  50% { opacity: .5; }
 }

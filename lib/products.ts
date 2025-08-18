@@ -1,35 +1,31 @@
-export type CatalogItem = {
-    id: string
-    name: string
-    description: string
-    priceCents: number
-    image: string
-    stripePriceId?: string // Replace with real price IDs from Stripe
-  }
-  
-  export const products: CatalogItem[] = [
-    {
-      id: 'bot-starter',
-      name: 'Discord Bot Starter',
-      description: 'Command handler, MongoDB models, slash commands, and logging.',
-      priceCents: 1999,
-      image: '/placeholder.png',
-      stripePriceId: '' // e.g. 'price_12345'
-    },
-    {
-      id: 'cad-starter',
-      name: 'CAD/MDT Starter',
-      description: 'Next.js + REST API skeleton with auth-ready structure.',
-      priceCents: 3999,
-      image: '/placeholder.png',
-      stripePriceId: ''
-    },
-    {
-      id: 'payments-kit',
-      name: 'Stripe Payments Kit',
-      description: 'Drop-in Stripe Checkout + webhook boilerplate.',
-      priceCents: 1499,
-      image: '/placeholder.png',
-      stripePriceId: ''
-    }
-  ]
+export type Media = { type: "image" | "video"; src: string; alt?: string };
+
+export type Product = {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  price: number; // in USD for now
+  badge?: string; // e.g., "standalone"
+  label?: string; // e.g., "Open Source"
+  description?: string;
+  cover: string;      // hero image
+  media?: Media[];    // gallery / preview
+};
+
+export const PRODUCTS: Product[] = [
+  {
+    slug: "moderation-bot",
+    title: "Moderation Bot",
+    subtitle: "Essential Moderation Commands. No bloat. Just the basics.",
+    price: 5.0,
+    badge: "standalone",
+    label: "Open Source",
+    description:
+      "Basic Moderation Bot, service any community.",
+    cover: "/products/simplified-speedo/hero.jpg",
+    media: [
+      { type: "image", src: "/products/simplified-speedo/shot-1.jpg", alt: "Speedo UI" },
+      { type: "video", src: "https://www.youtube.com/embed/dQw4w9WgXcQ" }, // replace with your video
+    ],
+  },
+];

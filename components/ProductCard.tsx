@@ -1,59 +1,118 @@
+// components/ProductCard.tsx
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import Link from 'next/link'
+import { memo, useState } from 'react'
+import { useCart } from '@/context/CartProvider'
 
-type Product = {
-  id: string
-  name: string
-  description: string
-  priceCents: number
+export type Product = {
+  id: string            // slug used in /store/[id]
+  title: string
+  blurb: string
+  price: number
   image: string
-  stripePriceId?: string
+  badge?: string        // e.g., "Available Now", "Preorder"
+  tags?: string[]
+  cta?: string          // "View Details" / "Pre-order" / etc.
 }
 
-export default function ProductCard({ product }: { product: Product }) {
-  const [loading, setLoading] = useState(false)
+function formatPrice(n: number) {
+  if (n === 0) return 'Free'
+  return `$${Number.isInteger(n) ? n.toFixed(0) : n.toFixed(2)}`
+}
 
-  const onBuy = async () => {
-    try {
-      setLoading(true)
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: product.id, priceId: product.stripePriceId })
-      })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        alert(data.error || 'Failed to create checkout session')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+function ProductCardImpl({ product }: { product: Product }) {
+  const { add } = useCart()
+  const [imgSrc, setImgSrc] = useState(product.image || '/images/placeholder-dark.jpg')
+
+  const isFree = product.price === 0
+  const isPreorder = (product.badge || '').toLowerCase().includes('pre')
 
   return (
-    <div className="rounded-2xl border p-4">
-      <div className="relative aspect-video overflow-hidden rounded-xl bg-gray-100">
-        <Image src={product.image} alt={product.name} fill className="object-cover" />
+    <div className="group overflow-hidden rounded-2xl border border-white/10 bg-[#14101c] shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+      {/* Media */}
+      <div className="relative overflow-hidden">
+        {/* lock ratio so grids stay tidy */}
+        <div className="relative aspect-[16/9] w-full">
+          <Image
+            src={imgSrc}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => setImgSrc('/images/placeholder-dark.jpg')}
+            priority={false}
+          />
+        </div>
+
+        {/* top-right badge */}
+        {product.badge && (
+          <span
+            className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[11px] font-semibold text-white ${
+              isPreorder ? 'bg-amber-500' : 'bg-pink-500'
+            }`}
+          >
+            {product.badge}
+          </span>
+        )}
+
+        {/* tag pill(s) bottom-left */}
+        {!!product.tags?.length && (
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
+            {product.tags.map((t) => (
+              <span key={t} className="rounded-md bg-black/55 px-2 py-1 text-[11px] text-gray-200">
+                ⌁ {t}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-      <h3 className="mt-4 text-lg font-semibold">{product.name}</h3>
-      <p className="mt-1 text-sm text-gray-600">{product.description}</p>
-      <div className="mt-4 flex items-center justify-between">
-        <span className="font-semibold">${(product.priceCents / 100).toFixed(2)}</span>
-        <button
-          onClick={onBuy}
-          disabled={loading || !product.stripePriceId}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading ? 'Redirecting…' : 'Buy'}
-        </button>
+
+      {/* Body */}
+      <div className="p-4">
+        <h3 className="text-lg font-semibold">{product.title}</h3>
+        <p className="mt-1 line-clamp-2 text-sm text-gray-400">{product.blurb}</p>
+
+        <div className="mt-5 flex items-center justify-between">
+          <div className="text-xl font-bold">{formatPrice(product.price)}</div>
+
+          <div className="flex items-center gap-2">
+            {/* Add to Cart */}
+            <button
+              type="button"
+              onClick={() =>
+                add(
+                  {
+                    productId: product.id,
+                    title: product.title,
+                    price: product.price,
+                    image: product.image,
+                  },
+                  1
+                )
+              }
+              className="rounded-xl border border-white/10 px-3 py-2 text-sm text-gray-200 hover:bg-white/5"
+              aria-label="Add to cart"
+              title="Add to cart"
+            >
+              🛒
+            </button>
+
+            {/* View details -> /store/[slug] */}
+            <Link
+              href={`/store/${product.id}`}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+            >
+              {product.cta ?? (isPreorder ? 'Pre-order' : 'View Details')}
+              <span aria-hidden>↗</span>
+            </Link>
+          </div>
+        </div>
       </div>
-      {!product.stripePriceId && (
-        <p className="mt-2 text-xs text-amber-600">Add a Stripe Price ID in <code>lib/products.ts</code> to enable checkout.</p>
-      )}
     </div>
   )
 }
+
+const ProductCard = memo(ProductCardImpl)
+export default ProductCard

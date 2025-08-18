@@ -1,19 +1,23 @@
+// auth.ts
 import NextAuth from "next-auth"
 import Discord from "next-auth/providers/discord"
 
-const handler = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Discord({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: false,
     }),
   ],
   session: { strategy: "jwt" },
-  secret: process.env.NEXTAUTH_SECRET, // <-- use NEXTAUTH_SECRET
+  secret: process.env.AUTH_SECRET, // paste the generated secret
   callbacks: {
     async jwt({ token, account, profile }) {
+      // Persist Discord id, avatar, etc. on first login
       if (account && profile) {
-        // @ts-ignore
+        token.provider = "discord"
+        // @ts-ignore - Discord profile includes id/avatar
         token.discordId = profile.id
         // @ts-ignore
         token.avatar = profile.avatar
@@ -21,6 +25,7 @@ const handler = NextAuth({
       return token
     },
     async session({ session, token }) {
+      // Expose extra fields to client
       // @ts-ignore
       session.user.id = token.discordId ?? session.user.id
       // @ts-ignore
@@ -29,5 +34,3 @@ const handler = NextAuth({
     },
   },
 })
-
-export { handler as GET, handler as POST }
